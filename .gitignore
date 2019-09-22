@@ -1,0 +1,5 @@
+# Ignore TypeScript output files
+dist
+
+# Ignore node modules
+node_modules

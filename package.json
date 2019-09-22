@@ -1,0 +1,24 @@
+{
+  "name": "hatstoarclicker",
+  "version": "0.1.0",
+  "description": "A Hat Stoar clicker game.",
+  "main": "dist/electron.js",
+  "scripts": {
+    "build": "webpack --config ./webpack.config.js",
+    "deploy": "gh-pages -d build",
+    "start": "npm run build && electron ./dist/electron.js"
+  },
+  "keywords": [],
+  "author": "Doc671",
+  "license": "MIT",
+  "devDependencies": {
+    "copy-webpack-plugin": "^5.0.4",
+    "electron": "^6.0.10",
+    "gh-pages": "^2.1.1",
+    "pixi.js": "^5.1.4",
+    "ts-loader": "^6.1.2",
+    "typescript": "^3.6.3",
+    "webpack": "^4.40.2",
+    "webpack-cli": "^3.3.9"
+  }
+}
