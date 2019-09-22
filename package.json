@@ -3,9 +3,11 @@
   "version": "0.1.0",
   "description": "A Hat Stoar clicker game.",
   "main": "dist/electron.js",
+  "homepage": "https://doc671.github.io/HatStoarClicker",
   "scripts": {
     "build": "webpack --config ./webpack.config.js",
     "deploy": "gh-pages -d build",
+    "predeploy": "npm run build",
     "start": "npm run build && electron ./dist/electron.js"
   },
   "keywords": [],
