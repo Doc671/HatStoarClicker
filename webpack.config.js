@@ -28,7 +28,7 @@ module.exports = {
     new CopyWebpackPlugin([{
         from: "src",
         to: "",
-        ignore: [".ts"]
+        ignore: ["*.ts"]
     }])
   ],
   devServer: {
