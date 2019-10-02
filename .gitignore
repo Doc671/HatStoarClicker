@@ -1,4 +1,4 @@
-# Ignore TypeScript output files
+# Ignore Webpack output files
 dist
 
 # Ignore node modules

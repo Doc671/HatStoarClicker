@@ -35,7 +35,7 @@ const indicatorTextStyle = {
 document.addEventListener("DOMContentLoaded", () => {
     // Set the title to the number of hats every 10 seconds
     setInterval(() => {
-        document.title = `The Hat Stoar Clicker: ${Math.round(Global.numberOfHats)} hats`;
+        document.title = `The Hat Stoar Clicker: ${Math.floor(Global.numberOfHats)} hats`;
     }, 10000);
 
     // Create window
@@ -110,11 +110,11 @@ function initialiseMainPage() : void {
     const statRectangle = drawRectangle(-5, -5, 400, 150, 0xAAAAAA, 10, 0x000000, 1);
     statContainer.addChild(statRectangle);
 
-    hatsIndicator = new Text(`Hats: ${Math.round(Global.numberOfHats)}`, indicatorTextStyle);
+    hatsIndicator = new Text(`Hats: ${Math.floor(Global.numberOfHats)}`, indicatorTextStyle);
     hatsIndicator.position.set(10, 10);
     statContainer.addChild(hatsIndicator);
 
-    hatsPerClickIndicator = new Text(`Hats per click: ${Math.round(Global.hatsPerClick)}`, indicatorTextStyle);
+    hatsPerClickIndicator = new Text(`Hats per click: ${Math.floor(Global.hatsPerClick)}`, indicatorTextStyle);
     hatsPerClickIndicator.position.set(10, 50);
     statContainer.addChild(hatsPerClickIndicator);
 
@@ -307,7 +307,7 @@ function initialiseMiddleDomePage() : void {
             currentRectangle.buttonMode = true;
             currentRectangle.on("pointerover", () => {
                 salespersonSprite.texture = Texture.from(salesperson.imagePath);
-            })
+            });
             currentRectangle.on("pointerdown", () => {
                 salespersonSprite.texture = Texture.from(salesperson.imagePath);
                 if (Global.numberOfHats >= salesperson.cost) {
@@ -330,8 +330,8 @@ function initialiseMiddleDomePage() : void {
 
 // Updates the indicators
 function updateIndicators() : void {
-    hatsIndicator.text = `Hats: ${Math.round(Global.numberOfHats)}`;
-    hatsPerClickIndicator.text = `Hats per click: ${Math.round(Global.hatsPerClick)}`;
+    hatsIndicator.text = `Hats: ${Math.floor(Global.numberOfHats)}`;
+    hatsPerClickIndicator.text = `Hats per click: ${Math.floor(Global.hatsPerClick)}`;
     activeSalespersonIndicator.text = `Salesperson: ${Global.activeSalesperson.name}`;
 }
 
