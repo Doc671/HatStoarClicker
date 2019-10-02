@@ -9,3 +9,4 @@ node_modules
 
 # Ignore Firebase files
 .firebase
+firebase.debug.log
