@@ -35,7 +35,7 @@ const indicatorTextStyle = {
 document.addEventListener("DOMContentLoaded", () => {
     // Set the title to the number of hats every 10 seconds
     setInterval(() => {
-        document.title = `The Hat Stoar Clicker: ${Global.numberOfHats} hats`;
+        document.title = `The Hat Stoar Clicker: ${Math.round(Global.numberOfHats)} hats`;
     }, 10000);
 
     // Create window
