@@ -1,9 +1,11 @@
-import { Application, Container, Graphics, Sprite, Text } from "pixi.js";
+import { Application, Container, Graphics, Sprite, Text, Texture } from "pixi.js";
 import { Global } from "./global";
+import { Salesperson } from "./salesperson";
 
 enum PageType {
     Main,
-    Map
+    Map,
+    MiddleDome
 }
 
 let app : Application;
@@ -12,11 +14,17 @@ let mainContainer : Container;
 let hatSprite : Sprite;
 let hatsIndicator : Text;
 let hatsPerClickIndicator : Text;
+let activeSalespersonIndicator : Text;
 let flavourTextContainer : Container;
+let mapButtonContainer : Container;
 let upgradeContainer : Container;
 let upgradeInfoContainer : Container;
 
 let mapContainer : Container;
+let hatStoarImage : Sprite;
+
+let middleDomeContainer : Container;
+let salespersonSprite : Sprite;
 
 const indicatorTextStyle = {
     fontFamily: "Corbel",
@@ -47,12 +55,27 @@ function changePage(pageType : PageType) : void
         case PageType.Main:
             app.renderer.backgroundColor = 0xFFFFFF;
             app.stage.removeChild(mapContainer);
+            
+            if (middleDomeContainer != undefined) {
+                app.stage.removeChild(middleDomeContainer);
+            }
+
             app.stage.addChild(mainContainer);
             break;
         case PageType.Map:
             app.renderer.backgroundColor = 0x0ABF0A;
             app.stage.removeChild(mainContainer);
+
+            if (middleDomeContainer != undefined)
+                app.stage.removeChild(middleDomeContainer);
+                
             app.stage.addChild(mapContainer);
+            break;
+        case PageType.MiddleDome:
+            app.renderer.backgroundColor = 0x0080FF;
+            app.stage.removeChild(mainContainer);
+            app.stage.removeChild(mapContainer);
+            app.stage.addChild(middleDomeContainer);
             break;
     }
 }
@@ -84,16 +107,20 @@ function initialiseMainPage() : void {
     // Create stat container & stat elements
     const statContainer = new Container();
 
-    const statRectangle = drawRectangle(-5, -5, 350, 100, 0xAAAAAA, 10, 0x000000, 1);
+    const statRectangle = drawRectangle(-5, -5, 400, 150, 0xAAAAAA, 10, 0x000000, 1);
     statContainer.addChild(statRectangle);
 
-    hatsIndicator = new Text(`Hats: ${Global.numberOfHats}`, indicatorTextStyle);
+    hatsIndicator = new Text(`Hats: ${Math.round(Global.numberOfHats)}`, indicatorTextStyle);
     hatsIndicator.position.set(10, 10);
     statContainer.addChild(hatsIndicator);
 
-    hatsPerClickIndicator = new Text(`Hats per click: ${Global.hatsPerClick}`, indicatorTextStyle);
+    hatsPerClickIndicator = new Text(`Hats per click: ${Math.round(Global.hatsPerClick)}`, indicatorTextStyle);
     hatsPerClickIndicator.position.set(10, 50);
     statContainer.addChild(hatsPerClickIndicator);
+
+    activeSalespersonIndicator = new Text(`Salesperson: ${Global.activeSalesperson.name}`, indicatorTextStyle);
+    activeSalespersonIndicator.position.set(10, 90);
+    statContainer.addChild(activeSalespersonIndicator);
 
     // Create upgrades
     upgradeContainer = new Container();
@@ -173,10 +200,9 @@ function initialiseMainPage() : void {
     // Create clickable hat
     hatSprite = Sprite.from("./assets/Hat7638.png");
     hatSprite.anchor.set(0.5, 0.5);
-    hatSprite.position.set(app.screen.width / 2 - hatSprite.width / 2, 
-        app.screen.height / 2 - hatSprite.height - 2);
     hatSprite.height = window.innerHeight * 0.5;
-    hatSprite.width = window.innerHeight * 0.26666666666;
+    hatSprite.width = window.innerHeight * 0.32;
+    hatSprite.position.set(app.screen.width / 2, app.screen.height / 2);
 
     hatSprite.interactive = true;
     hatSprite.buttonMode = true;
@@ -200,8 +226,8 @@ function initialiseMainPage() : void {
     });
 
     // Add the map button
-    const mapButtonContainer = new Container();
-    mapButtonContainer.position.set(0, app.screen.height - 95);
+    mapButtonContainer = new Container();
+    mapButtonContainer.position.set(-5, app.screen.height - 95);
 
     const mapButton = drawRectangle(0, 0, 150, 100, 0xAAAAAA, 10, 0x000000, 1);
     mapButton.interactive = true;
@@ -218,10 +244,13 @@ function initialiseMainPage() : void {
 
     mapButtonContainer.addChild(mapButton);
 
+    // These containers show in all pages
+    app.stage.addChild(mapButtonContainer);
+    app.stage.addChild(statContainer);
+
     mainContainer = new Container();
+    // These containers are part of the main page only
     mainContainer.addChild(flavourTextContainer);
-    mainContainer.addChild(mapButtonContainer);
-    mainContainer.addChild(statContainer);
     mainContainer.addChild(upgradeContainer);
     mainContainer.addChild(upgradeInfoContainer);
     mainContainer.addChild(hatSprite);
@@ -229,52 +258,91 @@ function initialiseMainPage() : void {
 }
 
 function initialiseMapPage() : void {
-    // Add the main button
-    const mainButtonContainer = new Container();
-    mainButtonContainer.position.set(0, app.screen.height - 95);
+    const mapText = new Text("Map", indicatorTextStyle);
+    mapText.position.set(app.screen.width / 2 - mapText.width / 2,
+        app.screen.height - mapText.height - 15);
 
-    const mainButton = drawRectangle(0, 0, 150, 100, 0x0ABF0A, 10, 0x000000, 1);
-    mainButton.interactive = true;
-    mainButton.buttonMode = true;
-    mainButton.on("pointerdown", () => {
+    const middleDomeImage = Sprite.from("./assets/MiddleDome.png");
+    middleDomeImage.scale.set(0.75, 0.75);
+    middleDomeImage.position.set(160, 170);
+    middleDomeImage.interactive = true;
+    middleDomeImage.buttonMode = true;
+    middleDomeImage.on("pointerdown", () => {
+        if (middleDomeContainer == undefined)
+            initialiseMiddleDomePage();
+        changePage(PageType.MiddleDome);
+    });
+
+    hatStoarImage = Sprite.from("./assets/TheHatStoar.png")
+    hatStoarImage.anchor.set(0.5, 0.5);
+    hatStoarImage.scale.set(0.75, 0.75);
+    hatStoarImage.position.set(app.screen.width / 2, app.screen.height / 2);
+    hatStoarImage.interactive = true;
+    hatStoarImage.buttonMode = true;
+    hatStoarImage.on("pointerdown", () => {
         changePage(PageType.Main);
     });
-    mainButtonContainer.addChild(mainButton);
-
-    const mainText = new Text("Main", indicatorTextStyle);
-    mainText.position.set(40, 35);
-    mainButton.addChild(mainText);
-
-    const mapText = new Text("Coming soon...?", indicatorTextStyle);
-    mapText.position.set(app.screen.width / 2 - mapText.width / 2,
-        app.screen.height / 2 - mapText.height / 2);
-
-    const hattMannImage = Sprite.from("./assets/HATTMANN.png");
-
-    const orangeImage = Sprite.from("./assets/Orange.png");
-    orangeImage.position.set(app.screen.width - orangeImage.texture.width, 
-        app.screen.height - orangeImage.texture.height );
-
+    
     mapContainer = new Container();
-    mapContainer.addChild(mainButtonContainer);
+    mapContainer.addChild(middleDomeImage);
+    mapContainer.addChild(hatStoarImage);
     mapContainer.addChild(mapText);
-    mapContainer.addChild(hattMannImage);
-    mapContainer.addChild(orangeImage);
+}
+
+function initialiseMiddleDomePage() : void {
+    middleDomeContainer = new Container();
+
+    salespersonSprite = new Sprite();
+    salespersonSprite.anchor.set(1, 0);
+    salespersonSprite.position.set(window.innerWidth, 0);
+    middleDomeContainer.addChild(salespersonSprite);
+
+    let position = 160;
+    Salesperson.AllSalespeople.slice(1, Salesperson.AllSalespeople.length).forEach(salesperson => {
+        const currentText = new Text(`${salesperson.name}: ${salesperson.cost} hats`, indicatorTextStyle);
+        currentText.position.set(10, position);
+        const currentRectangle = drawRectangle(0, position, currentText.width + 20, currentText.height + 5, 0x7FC9FF);
+        if (!Global.ownedSalespeople.includes(salesperson.id)) {
+            currentRectangle.interactive = true;
+            currentRectangle.buttonMode = true;
+            currentRectangle.on("pointerover", () => {
+                salespersonSprite.texture = Texture.from(salesperson.imagePath);
+            })
+            currentRectangle.on("pointerdown", () => {
+                salespersonSprite.texture = Texture.from(salesperson.imagePath);
+                if (Global.numberOfHats >= salesperson.cost) {
+                    currentRectangle.interactive = false;
+                    currentRectangle.buttonMode = false;
+                    Global.numberOfHats -= salesperson.cost;
+                    Global.ownedSalespeople.push(salesperson.id);
+                    Global.activeSalesperson = salesperson;
+                    currentText.text += " (bought)";
+                    currentRectangle.width = currentText.width + 20;
+                    updateIndicators();
+                }
+            });
+        }
+        position += 40;
+        middleDomeContainer.addChild(currentRectangle);
+        middleDomeContainer.addChild(currentText);
+    });
 }
 
 // Updates the indicators
 function updateIndicators() : void {
-    hatsIndicator.text = `Hats: ${String(Global.numberOfHats)}`;
-    hatsPerClickIndicator.text = `Hats per click: ${Global.hatsPerClick}`;
+    hatsIndicator.text = `Hats: ${Math.round(Global.numberOfHats)}`;
+    hatsPerClickIndicator.text = `Hats per click: ${Math.round(Global.hatsPerClick)}`;
+    activeSalespersonIndicator.text = `Salesperson: ${Global.activeSalesperson.name}`;
 }
 
 // Change locations of containers when the window is resized
 window.onresize = () => {
     hatSprite.height = window.innerHeight * 0.5;
-    hatSprite.width = window.innerHeight * 0.26666666666;
-    hatSprite.position.set(window.innerWidth / 2 - hatSprite.width / 2, 
-        window.innerHeight / 2 - hatSprite.height / 2);
+    hatSprite.width = window.innerHeight * 0.32;
+    hatSprite.position.set(window.innerWidth / 2, window.innerHeight / 2);
     flavourTextContainer.position.set(window.innerWidth / 2 - 350, window.innerHeight - 65);
+    mapButtonContainer.position.set(-5, window.innerHeight - 95);
     upgradeContainer.position.set(window.innerWidth - 345, -5);
     upgradeInfoContainer.position.set(window.innerWidth - 345, window.innerHeight - 95);
+    hatStoarImage.position.set(app.screen.width / 2, app.screen.height / 2);
 };
