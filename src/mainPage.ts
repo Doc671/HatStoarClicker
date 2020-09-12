@@ -22,51 +22,52 @@ export class MainPage extends Page {
         const upgradeText = new Text("Upgrades", Global.indicatorTextStyle);
         upgradeText.position.set(15, 10);
         this.upgradeContainer.addChild(upgradeText);
-
-        const upgradeButton = Global.drawRectangle(20, 55, 25, 25, 0xAAAAAA, 5, 0x000000, 1);
-        upgradeButton.interactive = true;
-        upgradeButton.buttonMode = true;
-        this.upgradeContainer.addChild(upgradeButton);
-
+        
         this.upgradeInfoContainer = new Container();
         this.upgradeInfoContainer.position.set(window.innerWidth - 345, window.innerHeight - 95);
 
-        const upgradeInfoRectangle = Global.drawRectangle(0, 0, 350, 100, 0xAAAAAA, 10, 0x000000, 1);
-        this.upgradeInfoContainer.addChild(upgradeInfoRectangle);
+        if (Global.ownedUpgradeIds.includes(0)) {
+            const upgradeButton = Global.drawRectangle(20, 55, 25, 25, 0xAAAAAA, 5, 0x000000, 1);
+            upgradeButton.interactive = true;
+            upgradeButton.buttonMode = true;
+            this.upgradeContainer.addChild(upgradeButton);
 
-        const upgradeInfoText = new Text("", {
-            fontFamily: "Corbel",
-            fontSize: 18,
-            fill: 0x000000
-        });
-        upgradeInfoText.position.set(10, 10);
-        this.upgradeInfoContainer.addChild(upgradeInfoText);
+            const upgradeInfoRectangle = Global.drawRectangle(0, 0, 350, 100, 0xAAAAAA, 10, 0x000000, 1);
+            this.upgradeInfoContainer.addChild(upgradeInfoRectangle);
 
-        upgradeButton.on("pointerdown", () => {
-            upgradeButton.tint = 0x888888;
-            upgradeInfoText.text = "";
-            if (Global.numberOfHats >= 50) {
-                Global.hatsPerClick++;
-                Global.numberOfHats -= 50;
-                this.upgradeContainer.removeChild(upgradeButton);
-                this.pageManager.persistentContainer.updateIndicators();
-            }
-        });
-        upgradeButton.on("pointerout", () => {
-            upgradeButton.tint = 0xFFFFFF;
-            upgradeInfoText.text = "";
-        });
+            const upgradeInfoText = new Text("", {
+                fontFamily: "Corbel",
+                fontSize: 18,
+                fill: 0x000000
+            });
+            upgradeInfoText.position.set(10, 10);
+            this.upgradeInfoContainer.addChild(upgradeInfoText);
 
-        upgradeButton.on("pointerover", () => {
-            upgradeButton.tint = 0xBBBBBB;
-            upgradeInfoText.text = "Increases hats per click to 2.\nCost: 50 hats.";
-        });
+            upgradeButton.on("pointerdown", () => {
+                upgradeButton.tint = 0x888888;
+                upgradeInfoText.text = "";
+                if (Global.numberOfHats >= 50) {
+                    Global.upgrade(0);
+                    this.upgradeContainer.removeChild(upgradeButton);
+                    this.pageManager.persistentContainer.updateIndicators();
+                }
+            });
+            upgradeButton.on("pointerout", () => {
+                upgradeButton.tint = 0xFFFFFF;
+                upgradeInfoText.text = "";
+            });
 
-        upgradeButton.on("pointerup", () => {
-            upgradeButton.tint = 0xFFFFFF;
-        });
+            upgradeButton.on("pointerover", () => {
+                upgradeButton.tint = 0xBBBBBB;
+                upgradeInfoText.text = "Increases hats per click to 2.\nCost: 50 hats.";
+            });
 
-        this.upgradeContainer.addChild(upgradeButton);
+            upgradeButton.on("pointerup", () => {
+                upgradeButton.tint = 0xFFFFFF;
+            });
+
+            this.upgradeContainer.addChild(upgradeButton);
+        }
 
         // Create flavour text
         this.flavourTextContainer = new Container();

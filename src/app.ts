@@ -11,9 +11,12 @@ let app : Application;
 let pageManager : PageManager;
 
 document.addEventListener("DOMContentLoaded", () => {
-    // Set the title to the number of hats every 10 seconds
+    Global.load();
+
+    // Set the title to the number of hats and save every 10 seconds
     setInterval(() => {
         document.title = `The Hat Stoar Clicker: ${Math.floor(Global.numberOfHats)} hats`;
+        Global.save();
     }, 10000);
 
     // Create window

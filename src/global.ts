@@ -1,5 +1,6 @@
 import { Graphics } from "pixi.js";
 import { Salesperson } from "./salesperson";
+import { Upgrade } from "./upgrade";
 
 export class Global {
     private static _hatsPerClick : number = 1;
@@ -11,6 +12,16 @@ export class Global {
     }
 
     public static numberOfHats : number = 0;
+
+    public static ownedUpgradeIds : number[] = [];
+
+    public static upgrade(upgradeId : number) {
+        let upgrade = Upgrade.upgrades[upgradeId];
+        if (this.numberOfHats >= upgrade.price) {
+            this.numberOfHats -= upgrade.price;
+            this.ownedUpgradeIds.push(upgradeId);
+        }
+    }
 
     public static ownedSalespeople : number[] = [0];
 
@@ -73,5 +84,23 @@ export class Global {
         rectangle.drawRect(x, y, width, height);
         rectangle.endFill();
         return rectangle;
+    }
+
+    public static load() : void {
+        if (localStorage.getItem("numberOfHats") != null)  {
+            this.numberOfHats = parseInt(localStorage.getItem("numberOfHats")!);
+            this.hatsPerClick = parseInt(localStorage.getItem("hatsPerClick")!);
+            this._salespersonNumber = parseInt(localStorage.getItem("salespersonNumber")!);
+            this.ownedSalespeople = localStorage.getItem("ownedSalespeople")?.split(',').map(rawId => parseInt(rawId))!;
+            this.ownedUpgradeIds = localStorage.getItem("ownedUpgradeIds")?.split(',').map(rawId => parseInt(rawId))!;
+        }
+    }
+
+    public static save() : void {
+        localStorage.setItem("numberOfHats", this.numberOfHats.toString());
+        localStorage.setItem("hatsPerClick", this._hatsPerClick.toString());
+        localStorage.setItem("salespersonNumber", this._salespersonNumber.toString());
+        localStorage.setItem("ownedSalespeople", this.ownedSalespeople.toString());
+        localStorage.setItem("ownedUpgradeIds", this.ownedUpgradeIds.toString());
     }
 }
