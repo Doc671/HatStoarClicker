@@ -6,7 +6,3 @@ node_modules
 
 # Ignore VS Code files
 .vscode
-
-# Ignore Firebase files
-.firebase
-firebase.debug.log
