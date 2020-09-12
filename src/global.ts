@@ -34,6 +34,7 @@ export class Global {
         { text : "!pooS puoP knirD", condition : true },
         { text : "Woahst on Toast", condition : true },
         { text : "You feel the sudden urge to get more hats.", condition : true },
+        { text : "Your inventory of hats is getting quite large.", condition : Global.numberOfHats > 500 },
         { text : "HATT MANN is raring to go!", condition : Global.ownedSalespeople.includes(1) },
         { text : "#feiLsIegnarO", condition : Global.ownedSalespeople.includes(2) }
     ];
